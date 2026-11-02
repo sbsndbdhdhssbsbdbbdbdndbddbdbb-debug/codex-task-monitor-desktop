@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue / 安全问题
+    url: https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/privately-reporting-a-security-vulnerability
+    about: Use the repository Security tab for private reports; never post credentials or private chats in issues. 使用仓库安全页私密报告，不要公开密钥或聊天记录。

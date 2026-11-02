@@ -1,0 +1,141 @@
+<Window x:Class="CodexTaskMonitor.App.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置"
+        Width="480"
+        Height="620"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource CanvasBrush}"
+        FontFamily="Microsoft YaHei UI, Segoe UI"
+        ShowInTaskbar="False">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="68"/>
+        </Grid.RowDefinitions>
+        <Border Background="White"
+                BorderBrush="{StaticResource LineBrush}"
+                BorderThickness="0,0,0,1">
+            <TextBlock Text="设置"
+                       Margin="22,0"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource InkBrush}"
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="22,18">
+                <TextBlock Text="提醒"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource MutedBrush}"/>
+                <TextBlock Text="普通完成提醒"
+                           Margin="0,13,0,6"
+                           Foreground="{StaticResource InkBrush}"/>
+                <ComboBox x:Name="NotificationModeBox"
+                          Height="34"
+                          SelectedValuePath="Tag">
+                    <ComboBoxItem Content="始终提醒" Tag="Always"/>
+                    <ComboBoxItem Content="仅在窗口后台时提醒" Tag="BackgroundOnly"/>
+                    <ComboBoxItem Content="只提醒需处理和失败" Tag="NeedsAttentionOnly"/>
+                    <ComboBoxItem Content="关闭普通完成提醒" Tag="Never"/>
+                </ComboBox>
+                <CheckBox x:Name="SoundCheck"
+                          Margin="0,14,0,0"
+                          Content="播放提醒声音"/>
+                <CheckBox x:Name="DoNotDisturbCheck"
+                          Margin="0,10,0,0"
+                          Content="开启勿扰模式（继续监控，不弹提醒）"/>
+                <CheckBox x:Name="PrivacyCheck"
+                          Margin="0,10,0,0"
+                          Content="隐私模式（提醒和 API 隐藏任务标题）"/>
+
+                <Border Height="1" Background="{StaticResource LineBrush}" Margin="0,20"/>
+                <TextBlock Text="桌面状态"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource MutedBrush}"/>
+                <CheckBox x:Name="DesktopPetCheck"
+                          Margin="0,13,0,0"
+                          Content="显示桌面悬浮窗"/>
+                <CheckBox x:Name="DesktopPetTopmostCheck"
+                          Margin="0,10,0,0"
+                          Content="始终置顶显示"/>
+                <CheckBox x:Name="DesktopPetAnimationsCheck"
+                          Margin="0,10,0,0"
+                          Content="播放桌宠动作动画"/>
+
+                <Border Height="1" Background="{StaticResource LineBrush}" Margin="0,20"/>
+                <TextBlock Text="本机集成"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource MutedBrush}"/>
+                <CheckBox x:Name="PetApiCheck"
+                          Margin="0,13,0,0"
+                          Content="启用桌宠 API"/>
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="需处理提醒间隔（分钟）"
+                               Foreground="{StaticResource InkBrush}"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="AttentionReminderBox"
+                             Grid.Column="1"
+                             Height="32"
+                             Padding="8,5"
+                             VerticalContentAlignment="Center"/>
+                </Grid>
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="监听端口"
+                               Foreground="{StaticResource InkBrush}"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="PortBox"
+                             Grid.Column="1"
+                             Height="32"
+                             Padding="8,5"
+                             VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Border Height="1" Background="{StaticResource LineBrush}" Margin="0,20"/>
+                <TextBlock Text="启动"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource MutedBrush}"/>
+                <CheckBox x:Name="AutoStartCheck"
+                          Margin="0,13,0,0"
+                          Content="登录 Windows 后自动启动"/>
+                <CheckBox x:Name="StartMinimizedCheck"
+                          Margin="0,10,0,0"
+                          Content="启动后直接进入托盘"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="{StaticResource LineBrush}"
+                BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="22,0">
+                <Button Content="取消"
+                        Width="78"
+                        Click="OnCancelClick"/>
+                <Button Content="保存"
+                        Width="78"
+                        Margin="8,0,0,0"
+                        Style="{StaticResource PrimaryButton}"
+                        Click="OnSaveClick"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

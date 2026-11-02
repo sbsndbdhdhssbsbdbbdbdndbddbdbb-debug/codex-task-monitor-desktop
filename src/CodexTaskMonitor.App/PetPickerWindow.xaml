@@ -1,0 +1,164 @@
+<Window x:Class="CodexTaskMonitor.App.PetPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CodexTaskMonitor.App"
+        Title="桌宠库" Width="1060" Height="760" MinWidth="880" MinHeight="640"
+        WindowStartupLocation="CenterOwner" Background="White" FontFamily="Microsoft YaHei UI, Segoe UI" ShowInTaskbar="False">
+    <Window.Resources>
+        <Style x:Key="PetTile" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="White"/><Setter Property="Padding" Value="12"/>
+            <Setter Property="BorderThickness" Value="2"/><Setter Property="BorderBrush" Value="#EBEBEB"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter Property="BorderBrush" Value="#202020"/></DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="92"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="60"/></Grid.RowDefinitions>
+        <Grid Margin="24,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="桌宠库" FontSize="24" FontWeight="Bold" Foreground="{StaticResource InkBrush}"/>
+                <TextBlock Text="换个伙伴，一起开工。" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,5,0,0"/>
+            </StackPanel>
+            <Button Grid.Column="1" Height="36" VerticalAlignment="Center" Click="OnOpenPetdexWebsiteClick" ToolTip="在浏览器中浏览 Petdex 官方素材库">
+                <StackPanel Orientation="Horizontal"><TextBlock Text="官方浏览"/><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A7;" Margin="8,0,0,0" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+        </Grid>
+        <Border Grid.Row="1" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="24,0,24,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="我的桌宠" GroupName="Library" Style="{StaticResource SegmentButton}" IsChecked="{Binding IsLibraryVisible, Mode=OneWay}" Click="OnLibraryClick"/>
+                    <RadioButton Content="发现桌宠" GroupName="Library" Style="{StaticResource SegmentButton}" IsChecked="{Binding IsCatalogVisible, Mode=OneWay}" Click="OnDiscoverClick"/>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" Style="{StaticResource IconButton}" Content="&#xE72C;" Click="OnRefreshPetsClick" IsEnabled="{Binding CanInteract}" ToolTip="{Binding RefreshTooltip}"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" x:Name="LibraryContent">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="244"/></Grid.ColumnDefinitions>
+            <Grid Margin="24,20,16,0">
+                <Grid Visibility="{Binding IsLibraryVisible, Converter={StaticResource BoolVisibility}}">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <TextBlock Text="{Binding LibrarySummary}" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,0,0,14"/>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,0,16">
+                        <ItemsControl ItemsSource="{Binding Pets}">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate><DataTemplate>
+                                <Grid Width="166" Height="206" Margin="0,0,12,12">
+                                    <Button Style="{StaticResource PetTile}" Click="OnPetClick" IsEnabled="{Binding DataContext.CanInteract, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="切换为此桌宠">
+                                        <Grid Width="134">
+                                            <Grid.RowDefinitions><RowDefinition Height="118"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                            <local:SpritePetControl SpriteSheet="{Binding Package.SpriteSheet}" Columns="{Binding Package.Columns}" Rows="{Binding Package.Rows}" AnimationRow="{Binding PackagePreviewRow}" Width="112" Height="112">
+                                                <local:SpritePetControl.Style><Style TargetType="local:SpritePetControl">
+                                                    <Setter Property="IsAnimationEnabled" Value="False"/>
+                                                    <Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"/>
+                                                        <Condition Binding="{Binding DataContext.AnimationsEnabled, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions><Setter Property="IsAnimationEnabled" Value="True"/></MultiDataTrigger></Style.Triggers>
+                                                </Style></local:SpritePetControl.Style>
+                                            </local:SpritePetControl>
+                                            <TextBlock Grid.Row="1" Text="{Binding Package.Name}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="0,5,0,6"/>
+                                            <Grid Grid.Row="2">
+                                                <TextBlock Text="{Binding SourceLabel}" FontSize="11" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" Visibility="{Binding IsSelected, Converter={StaticResource InverseBoolVisibility}}"/>
+                                                <TextBlock Text="正在陪伴" FontSize="11" Foreground="#227350" HorizontalAlignment="Center" Visibility="{Binding IsSelected, Converter={StaticResource BoolVisibility}}"/>
+                                            </Grid>
+                                        </Grid>
+                                    </Button>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,7,7,0" Width="26" Height="26" Style="{StaticResource IconButton}"
+                                            FontSize="12" Content="&#xE74D;" Click="OnDeletePetClick" ToolTip="删除此角色的本地素材" IsEnabled="{Binding DataContext.CanInteract, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            Visibility="{Binding CanDelete, Converter={StaticResource BoolVisibility}}"/>
+                                </Grid>
+                            </DataTemplate></ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+                <Grid Visibility="{Binding IsCatalogVisible, Converter={StaticResource BoolVisibility}}">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid Margin="0,0,8,14">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid>
+                            <TextBox x:Name="CatalogSearch" Height="36" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=250}" Padding="32,7,10,7" ToolTip="搜索角色名称、类型或作者"/>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" Margin="11,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                            <TextBlock Text="搜索角色或作者" Margin="32,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Foreground="{StaticResource MutedBrush}">
+                                <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding SearchText}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="&#xE72C;" Margin="8,0,0,0" Click="OnReloadCatalogClick" ToolTip="重新加载在线目录" IsEnabled="{Binding CanInteract}"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <ScrollViewer x:Name="CatalogScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding FilteredCatalog}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate><DataTemplate>
+                                    <Border Width="166" Height="224" Margin="0,0,12,12" Padding="12" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6">
+                                        <Grid>
+                                            <Grid.RowDefinitions><RowDefinition Height="104"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="34"/></Grid.RowDefinitions>
+                                            <local:PetdexPreviewControl Session="{Binding DataContext.Previews, RelativeSource={RelativeSource AncestorType=Window}}" SpriteSheetUri="{Binding Entry.SpriteSheetUri}" Width="104" Height="104" HorizontalAlignment="Center"/>
+                                            <TextBlock Grid.Row="1" Text="{Binding Entry.DisplayName}" ToolTip="{Binding Entry.DisplayName}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,8,0,4"/>
+                                            <TextBlock Grid.Row="2" Text="{Binding Subtitle}" FontSize="11" Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <Button Grid.Row="4" Content="{Binding ActionText}" Click="OnCatalogInstallClick" FontSize="12" Padding="6,4" IsEnabled="{Binding DataContext.CanInteract, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate></ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsCatalogEmpty, Converter={StaticResource BoolVisibility}}">
+                            <TextBlock Text="还没找到这位伙伴" FontSize="16" FontWeight="SemiBold"/><Button Content="清空搜索" Click="OnClearSearchClick" Margin="0,14,0,0"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="310" Margin="16"
+                                    Visibility="{Binding IsCatalogNotLoaded, Converter={StaticResource BoolVisibility}}">
+                            <TextBlock Text="在线目录暂未加载" FontSize="16" FontWeight="SemiBold" TextAlignment="Center"/>
+                            <TextBlock Text="{Binding CatalogErrorMessage}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,6"/>
+                            <TextBlock Text="已安装的桌宠不受影响" FontSize="12" Foreground="{StaticResource MutedBrush}" TextAlignment="Center" Margin="0,0,0,16"/>
+                            <Button Content="重新加载" HorizontalAlignment="Center" Click="OnReloadCatalogClick"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="2" Margin="0,8,8,16">
+                        <TextBlock Text="{Binding CatalogSummary}" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Style="{StaticResource IconButton}" Content="&#xE76B;" ToolTip="上一页" IsEnabled="{Binding HasPreviousCatalog}" Click="OnPreviousCatalogPageClick"/>
+                            <TextBlock Text="{Binding CatalogPageLabel}" FontSize="12" Margin="14,0" VerticalAlignment="Center"/>
+                            <Button Style="{StaticResource IconButton}" Content="&#xE76C;" ToolTip="下一页" IsEnabled="{Binding HasNextCatalog}" Click="OnNextCatalogPageClick"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Border Grid.Column="1" Background="#FAFAFA" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="22,24,22,16">
+                        <TextBlock Text="正在陪伴" FontSize="13" FontWeight="SemiBold"/>
+                        <Grid Height="182" Margin="0,14,0,0" DataContext="{Binding CurrentPet}">
+                            <local:SpritePetControl SpriteSheet="{Binding Package.SpriteSheet}" Columns="{Binding Package.Columns}" Rows="{Binding Package.Rows}" AnimationRow="{Binding PackagePreviewRow}" Width="154" Height="154" IsAnimationEnabled="{Binding DataContext.AnimationsEnabled, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <Path Data="M 20,170 L 62,171 L 116,169 L 176,170" Stroke="#252525" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" VerticalAlignment="Top" IsHitTestVisible="False"/>
+                        </Grid>
+                        <TextBlock Text="{Binding CurrentPet.Package.Name}" FontSize="18" FontWeight="Bold" TextWrapping="Wrap" Margin="0,6,0,8"/>
+                        <TextBlock Text="{Binding CurrentPet.Package.Description}" FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" MaxHeight="66" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    </ScrollViewer>
+                    <StackPanel Grid.Row="1" Margin="22,0,22,20">
+                        <Border Height="1" Background="{StaticResource LineBrush}" Margin="0,0,0,16"/>
+                        <TextBlock Text="添加新伙伴" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        <TextBox x:Name="InstallInput" Height="60" Text="{Binding InstallValue, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" VerticalContentAlignment="Top" KeyDown="OnInstallKeyDown" ToolTip="角色名、Petdex 角色链接或 npx 安装命令"/>
+                        <TextBlock Text="名称 / 链接 / 安装命令" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,7,0,12"/>
+                        <Button Content="下载并使用" Style="{StaticResource PrimaryButton}" Height="38" Click="OnInstallClick" IsEnabled="{Binding CanInstall}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+        <Border Grid.Row="3" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+            <Grid>
+                <ProgressBar Height="2" VerticalAlignment="Top" IsIndeterminate="{Binding IsBusy}" Foreground="#252525" Background="Transparent" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}"/>
+                <Grid Margin="24,8">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding FeedbackBrush}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" ToolTip="{Binding StatusMessage}"/>
+                    <Button Grid.Column="1" Content="取消加载" Click="OnCancelOperationClick" Margin="0,0,8,0" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}"/>
+                    <Button Grid.Column="2" Content="完成" Width="80" Click="OnCloseClick"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

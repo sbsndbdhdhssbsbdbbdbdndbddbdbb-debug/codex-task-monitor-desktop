@@ -1,0 +1,17 @@
+name: Feature request / 功能建议
+description: Suggest an improvement to monitoring, notifications, or pets. 建议改进任务监听、通知或桌宠体验。
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve / 希望解决的问题
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior / 建议的使用方式
+    validations:
+      required: true
